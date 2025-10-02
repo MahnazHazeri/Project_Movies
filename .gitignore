@@ -1,0 +1,6 @@
+# محتوای فایل .gitignore
+
+venv/
+__pycache__/
+*.pyc
+*.db
