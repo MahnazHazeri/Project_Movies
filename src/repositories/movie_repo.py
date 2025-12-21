@@ -1,20 +1,33 @@
+from contextlib import asynccontextmanager
+from typing import Any
+from archipy.adapters.base.sqlalchemy.adapters import AsyncBaseSQLAlchemyAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
-from  sqlalchemy.future import select
-from src.models import Movie
-from uuid import UUID
+from src.models.model import Movie
+from sqlalchemy import select, func
+
+class MovieRepository(AsyncBaseSQLAlchemyAdapter[Movie]):
 
 
-class MovieRepository:
     def __init__(self, session: AsyncSession):
+        super().__init__(session)
+
         self.session = session
 
-    async def get_by_id(self, movie_uuid:UUID) -> Movie | None:
-        query = select(Movie).where(Movie.movie_uuid == movie_uuid)
-        result = await self.session.execute(query)
-        return result.scalar_one_or_none()
-    
+    @asynccontextmanager
+    async def _create_async_session_manager(self,configs: Any = None):
+        yield self.session
 
-    async def add(self, movie:Movie) -> Movie:
-        self.session.add(movie)
-        return movie
-    
+
+    async def  get_stats(self):
+
+        query = select(
+            Movie.status,
+            func.count(Movie.pk_uuid),
+            func.avg(Movie.rating)).group_by(Movie.status)
+        
+        result = await self.session.execute(query)
+        return result.all()
+
+
+
+

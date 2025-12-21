@@ -1,10 +1,11 @@
+from archipy.models.entities.sqlalchemy.base_entities import BaseEntity
 import uuid
 from uuid import UUID
 from datetime import datetime, timezone
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, synonym
 from sqlalchemy import String, Integer,Text,Enum,TIMESTAMP, CheckConstraint
 from enum import Enum as PyEnum
-from src.db import Base
+
 
 #------------ Movie status -----------
 class MovieStatus(PyEnum):
@@ -13,10 +14,14 @@ class MovieStatus(PyEnum):
 
 
 #------------- Movie model ------------
-class Movie(Base):
+class Movie(BaseEntity):
     __tablename__ = "moviedata"
 
-    movie_uuid: Mapped[UUID] = mapped_column(primary_key=True, index=True,default=uuid.uuid4)
+
+ 
+    pk_uuid = synonym("movie_uuid") 
+    movie_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    
     title: Mapped[str] = mapped_column(String(225),nullable=False)
     status: Mapped[MovieStatus] = mapped_column(Enum(MovieStatus), nullable=False)
     release_year: Mapped[int | None] = mapped_column(Integer,nullable=True,default=None)
