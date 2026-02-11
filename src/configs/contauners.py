@@ -3,7 +3,6 @@ from archipy.adapters.postgres.sqlalchemy.adapters import AsyncPostgresSQLAlchem
 
 from src.configs.runtime_config import RuntimeConfig
 from src.logics.movie.movie_logic import MovieLogic
-from src.repositories.movie_repository import MovieRepository
 from src.repositories.adapters import MoviePostgresAdapter
 
 class ServiceContainer(containers.DeclarativeContainer):
@@ -20,12 +19,7 @@ class ServiceContainer(containers.DeclarativeContainer):
         adapter=_postgres_adapter,
     )
 
-    _movie_repository = providers.ThreadSafeSingleton(
-        MovieRepository,
-        postgres_adapter=_movie_postgres_adapter,
-    )
-
     movie_logic = providers.Factory(
         MovieLogic,
-        db=_postgres_adapter.provided.session,
+        movie_repository=_movie_postgres_adapter,
     )
