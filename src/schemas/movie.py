@@ -2,7 +2,8 @@ from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from datetime import datetime
 from src.models.types_ import MovieStatusType
-
+from sqlalchemy import UUID
+from uuid import UUID
 
 class BaseMovie(BaseModel):
     title: Optional[str] = None
@@ -14,7 +15,7 @@ class BaseMovie(BaseModel):
 
 
 class MovieCreate(BaseMovie):
-    title: str = Field(..., min_length=1)
+    title: str 
     status: MovieStatusType
 
     @field_validator("title")
@@ -30,7 +31,7 @@ class MovieUpdate(BaseMovie):
 
 
 class MovieResponse(BaseMovie):
-    movie_uuid: str
+    movie_uuid: UUID
     created_at: datetime
 
     class Config:
